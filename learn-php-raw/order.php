@@ -124,7 +124,6 @@ class Order
   }
 }
 
-// Main logic
 $db = new Database();
 $db_conn = $db->connect();
 $product = new Product($db_conn);
@@ -141,14 +140,16 @@ $user_data = $user->getUser();
 if (!isset($_SESSION['cart']) || empty($_SESSION['cart'])) {
   $em = "Your cart is empty. Please add items to your cart before checking out.";
 }
+if (isset($_SESSION['cart']) && !empty($_SESSION['cart'])) {
+  $total_amount = 0;
 
-$total_amount = 0;
-
-foreach ($_SESSION['cart'] as $product_id => $quantity) {
-  $product_data = $product->getProductById($product_id);
-  if ($product_data) {
-    $total_amount += $product_data['price'] * $quantity;
+  foreach ($_SESSION['cart'] as $product_id => $quantity) {
+    $product_data = $product->getProductById($product_id);
+    if ($product_data) {
+      $total_amount += $product_data['price'] * $quantity;
+    }
   }
+} else {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -159,10 +160,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $order->addOrderDetail($order_id, $product_id, $quantity, $product_data['price']);
     }
   }
-  unset($_SESSION['cart']);
-  $success_msg = "Your order has been placed successfully!";
-}
 
+  unset($_SESSION['cart']);
+  $_SESSION['success_msg'] = "Your order has been placed successfully!";
+  header("Location: order.php");
+  exit;
+}
 ?>
 
 <!DOCTYPE html>
@@ -177,8 +180,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <body>
   <?php include 'navbar.php'; ?>
+
   <div class="order-container">
     <h1>Order Confirmation</h1>
+
+    <?php
+    if (isset($_SESSION['success_msg'])) {
+      echo "<p class='success-message'>" . $_SESSION['success_msg'] . "</p>";
+      unset($_SESSION['success_msg']);
+    }
+    ?>
+
     <div class="user-info">
       <h2>Your Information</h2>
       <p><strong>Name:</strong> <?php echo htmlspecialchars($user_data['full_name']); ?></p>

@@ -1,54 +1,22 @@
 <?php
 session_start();
+include_once 'Controller/Order.php';
 
-if (!isset($_COOKIE['user_id'])) {
-  $em = "Please login first";
-  Util::redirect("login.php", "error", $em);
-}
+$orderController = new OrderController();
 
-include "Models/Product.php";
-include "Models/Order.php";
-include "Models/User.php";
-include "Database.php";
+$orderController->checkUserLogin();
 
-
-$db = new Database();
-$db_conn = $db->connect();
-$product = new Product($db_conn);
-$order = new Order($db_conn);
-$user = new User($db_conn);
-$user->init($_COOKIE['user_id']);
-$user_data = $user->getUser();
-
-if (!isset($_SESSION['cart']) || empty($_COOKIE['cart'])) {
+if ($orderController->isCartEmpty()) {
   $em = "Your cart is empty. Please add items to your cart before checking out.";
+  Util::redirect("cart.php", "error", $em);
 }
 
-$total_amount = 0;
+$user_data = $orderController->getUserData();
 
-foreach ($_SESSION['cart'] as $product_id => $quantity) {
-  $product_data = $product->getProductById($product_id);
-  if ($product_data) {
-    $total_amount += $product_data['price'] * $quantity;
-  }
-}
+$total_amount = $orderController->getTotalAmount();
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-  $user_id = $_COOKIE['user_id'];
-
-  $order_id = $order->createOrder($user_id, $total_amount);
-
-  foreach ($_SESSION['cart'] as $product_id => $quantity) {
-    $product_data = $product->getProductById($product_id);
-    if ($product_data) {
-      $order->addOrderDetail($order_id, $product_id, $quantity, $product_data['price']);
-      $total_amount = 0;
-    }
-  }
-
-  unset($_SESSION['cart']);
-
-  $success_msg = "Your order has been placed successfully!";
+  $success_msg = $orderController->createOrder();
 }
 
 ?>
@@ -67,6 +35,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   <?php include 'navbar.php'; ?>
   <div class="order-container">
     <h1>Order Confirmation</h1>
+
+    <?php if (isset($success_msg)): ?>
+      <p class="success-msg"><?php echo htmlspecialchars($success_msg); ?></p>
+    <?php endif; ?>
 
     <div class="user-info">
       <h2>Your Information</h2>

@@ -5,7 +5,7 @@ class Product
   private $table_name;
   private $conn;
 
-  function __construct($db_conn)
+  public function __construct($db_conn)
   {
     $this->conn = $db_conn;
     $this->table_name = "Products";
@@ -19,16 +19,12 @@ class Product
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
 
-
   public function getProductById($id)
   {
     $query = "SELECT * FROM " . $this->table_name . " WHERE id = :id";
     $stmt = $this->conn->prepare($query);
-
     $stmt->bindValue(':id', $id, PDO::PARAM_INT);
-
     $stmt->execute();
-
     return $stmt->fetch(PDO::FETCH_ASSOC);
   }
 
@@ -44,10 +40,8 @@ class Product
   {
     $query = "SELECT * FROM " . $this->table_name . " LIMIT :limit OFFSET :offset";
     $stmt = $this->conn->prepare($query);
-
     $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
     $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }

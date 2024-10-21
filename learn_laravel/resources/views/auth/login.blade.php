@@ -32,7 +32,7 @@
             <button type="submit">Login</button>
           </div>
           <div class="form-group text-end">
-            You don't have an account? <a href="signup.php">Sign Up</a>
+            You don't have an account? <a href="register">Sign Up</a>
           </div>
       </form>
     </div>

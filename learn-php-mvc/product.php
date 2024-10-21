@@ -1,41 +1,15 @@
 <?php
 session_start();
-include "Models/Product.php";
-include "Database.php";
+include_once 'Controller/Product.php';
 
-$db = new Database();
-$db_conn = $db->connect();
-$product = new Product($db_conn);
+$productController = new ProductController();
 
-if (!isset($_SESSION['cart'])) {
-  $_SESSION['cart'] = [];
-}
+$productController->handleAddToCart();
 
-if (!isset($_SESSION['csrf_token'])) {
-  $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
-
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['product_id'])) {
-  $product_id = $_POST['product_id'];
-  $product_data = $product->getProductById($product_id);
-
-  if ($product_data) {
-    if (isset($_SESSION['cart'][$product_id])) {
-      $_SESSION['cart'][$product_id]++;
-    } else {
-      $_SESSION['cart'][$product_id] = 1;
-    }
-  }
-}
-
-$total_products = $product->getTotalProducts();
-$limit = 10;
-$total_pages = ceil($total_products / $limit);
-$page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
-$offset = ($page - 1) * $limit;
-
-$productList = $product->getProductList($limit, $offset);
-
+$data = $productController->getProductListAndPagination();
+$productList = $data['productList'];
+$total_pages = $data['total_pages'];
+$page = $data['current_page'];
 
 ?>
 
@@ -53,7 +27,7 @@ $productList = $product->getProductList($limit, $offset);
   <?php include 'navbar.php'; ?>
 
   <div class="container">
-    <div class=" grid-container">
+    <div class="grid-container">
       <?php foreach ($productList as $product) { ?>
         <div class="card">
           <h3><?php echo htmlspecialchars($product['product_name']); ?></h3>
@@ -69,6 +43,7 @@ $productList = $product->getProductList($limit, $offset);
       <?php } ?>
     </div>
   </div>
+
   <div class="pagination">
     <?php if ($page > 1): ?>
       <a href="?page=<?php echo $page - 1; ?>">Previous</a>
