@@ -1,0 +1,93 @@
+*{
+	padding: 0;
+	margin: 0;
+	font-family: Arial, sans-serif;
+	box-sizing: border-box;
+}
+
+
+.container{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  padding: 20px;
+  max-width: 1200px;
+}
+
+.card {
+  border: 1px solid #ccc;
+  padding: 15px;
+  border-radius: 10px;
+  text-align: center;
+  transition: 0.3s;
+  max-width: 250px;
+}
+
+.card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.card img {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+.card button {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.card button:hover {
+  background-color: #218838;
+}
+
+.price {
+  font-size: 18px;
+  color: #555;
+}
+
+.custom-pagination nav  {
+  color: white; 
+  background-color: white;
+}
+
+.custom-pagination .pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  gap: 10px;
+  list-style-type: none;
+}
+
+
+.pagination .page-item{
+  padding: 10px 15px;
+  margin: 5px;
+  text-decoration: none;
+  background-color: #f1f1f1;
+  color: #000;
+  border: 1px solid #ddd;
+  text-decoration: none;
+}
+
+.pagination .active {
+  background-color: #4CAF50;
+  color: white;
+  border: 1px solid #4CAF50;
+}
+
+.page-item a {
+  text-decoration: none;
+}
